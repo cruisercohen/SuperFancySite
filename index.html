@@ -3,26 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Fancy Site</title>
+    <title>Super Fancy Site ✨</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Animated background particles -->
-    <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
+    <!-- Canvas for particle system -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Animated aurora background -->
+    <div class="aurora">
+        <div class="aurora-band aurora-band-1"></div>
+        <div class="aurora-band aurora-band-2"></div>
+        <div class="aurora-band aurora-band-3"></div>
     </div>
+
+    <!-- Noise texture overlay -->
+    <div class="noise-overlay"></div>
 
     <!-- Navigation -->
     <nav class="navbar">
@@ -30,12 +27,17 @@
             <a href="#" class="logo">
                 <span class="logo-icon">&#10024;</span>
                 <span class="logo-text">SuperFancy</span>
+                <span class="logo-badge">v11</span>
             </a>
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#showcase">Showcase</a>
+                <a href="#testimonials">Hype</a>
                 <a href="#contact">Contact</a>
-                <a href="#" class="nav-cta">Get Started</a>
+                <a href="#" class="nav-cta">
+                    <span class="cta-pulse"></span>
+                    Get Started
+                </a>
             </div>
         </div>
     </nav>
@@ -43,41 +45,103 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-badge">&#9889; Next-Level Design</div>
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                &#9889; Fanciness Level: MAXIMUM
+            </div>
             <h1 class="hero-title">
                 <span class="line">Welcome to the</span>
-                <span class="line gradient-text">Super Fancy</span>
-                <span class="line">Future</span>
+                <span class="line"><span class="gradient-text glitch" data-text="Super Fancy">Super Fancy</span></span>
+                <span class="line">Dimension</span>
             </h1>
             <p class="hero-subtitle">
-                Experience the pinnacle of modern web design. Stunning visuals, 
-                buttery-smooth animations, and interfaces that feel like magic.
+                We turned the fanciness dial past 10, ripped it off, and threw it into the sun.
+                This isn't a website. It's an <em>experience</em>.
             </p>
             <div class="hero-buttons">
-                <a href="#features" class="btn btn-primary">
-                    <span>Explore Now</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
+                <a href="#features" class="btn btn-primary btn-glow">
+                    <span class="btn-text">Enter the Fancy</span>
+                    <span class="btn-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <span class="btn-shine"></span>
                 </a>
-                <a href="#showcase" class="btn btn-secondary">See the Magic</a>
+                <a href="#showcase" class="btn btn-secondary btn-morph">
+                    <span>Witness Greatness</span>
+                </a>
+            </div>
+            <div class="hero-scroll-indicator">
+                <div class="scroll-mouse">
+                    <div class="scroll-dot"></div>
+                </div>
+                <span>Scroll to explore</span>
             </div>
         </div>
         <div class="hero-visual">
             <div class="orb orb-1"></div>
             <div class="orb orb-2"></div>
             <div class="orb orb-3"></div>
+            <div class="orb orb-4"></div>
             <div class="floating-card card-1">
                 <div class="card-icon">&#127912;</div>
                 <span>Design</span>
+                <div class="card-sparkle"></div>
             </div>
             <div class="floating-card card-2">
                 <div class="card-icon">&#9889;</div>
                 <span>Speed</span>
+                <div class="card-sparkle"></div>
             </div>
             <div class="floating-card card-3">
                 <div class="card-icon">&#10024;</div>
                 <span>Magic</span>
+                <div class="card-sparkle"></div>
+            </div>
+            <div class="floating-card card-4">
+                <div class="card-icon">&#128142;</div>
+                <span>Premium</span>
+                <div class="card-sparkle"></div>
+            </div>
+            <!-- 3D rotating ring -->
+            <div class="hero-ring">
+                <div class="ring-segment"></div>
+                <div class="ring-segment"></div>
+                <div class="ring-segment"></div>
+                <div class="ring-segment"></div>
+                <div class="ring-segment"></div>
+                <div class="ring-segment"></div>
+                <div class="ring-segment"></div>
+                <div class="ring-segment"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marquee Banner -->
+    <section class="marquee-section">
+        <div class="marquee-track">
+            <div class="marquee-content">
+                <span>SUPER FANCY</span>
+                <span class="marquee-dot">&#9670;</span>
+                <span>MAXIMUM STYLE</span>
+                <span class="marquee-dot">&#9670;</span>
+                <span>ZERO BORING</span>
+                <span class="marquee-dot">&#9670;</span>
+                <span>PURE VIBES</span>
+                <span class="marquee-dot">&#9670;</span>
+                <span>WOW FACTOR</span>
+                <span class="marquee-dot">&#9670;</span>
+                <span>SUPER FANCY</span>
+                <span class="marquee-dot">&#9670;</span>
+                <span>MAXIMUM STYLE</span>
+                <span class="marquee-dot">&#9670;</span>
+                <span>ZERO BORING</span>
+                <span class="marquee-dot">&#9670;</span>
+                <span>PURE VIBES</span>
+                <span class="marquee-dot">&#9670;</span>
+                <span>WOW FACTOR</span>
+                <span class="marquee-dot">&#9670;</span>
             </div>
         </div>
     </section>
@@ -85,45 +149,64 @@
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-header">
+            <div class="section-eyebrow">&#128165; FEATURES</div>
             <h2 class="section-title">Why We're <span class="gradient-text">Super Fancy</span></h2>
-            <p class="section-subtitle">We didn't just raise the bar. We launched it into orbit.</p>
+            <p class="section-subtitle">We didn't just raise the bar. We yeeted it into another galaxy.</p>
         </div>
         <div class="features-grid">
-            <div class="feature-card">
+            <div class="feature-card" data-tilt>
+                <div class="feature-card-bg"></div>
+                <div class="feature-number">01</div>
                 <div class="feature-icon">&#127752;</div>
-                <h3>Stunning Gradients</h3>
-                <p>Every pixel is infused with carefully crafted color transitions that mesmerize and delight.</p>
+                <h3>Holographic Gradients</h3>
+                <p>Colors that shift like a hologram card from the future. Every angle reveals new beauty.</p>
                 <div class="feature-glow"></div>
+                <div class="feature-border"></div>
             </div>
-            <div class="feature-card">
+            <div class="feature-card" data-tilt>
+                <div class="feature-card-bg"></div>
+                <div class="feature-number">02</div>
                 <div class="feature-icon">&#128171;</div>
-                <h3>Blazing Fast</h3>
-                <p>Performance so smooth it feels like the future arrived early. 60fps everywhere.</p>
+                <h3>Ludicrous Speed</h3>
+                <p>Performance so buttery, your screen might start dripping. 120fps or we riot.</p>
                 <div class="feature-glow"></div>
+                <div class="feature-border"></div>
             </div>
-            <div class="feature-card">
+            <div class="feature-card" data-tilt>
+                <div class="feature-card-bg"></div>
+                <div class="feature-number">03</div>
                 <div class="feature-icon">&#129668;</div>
-                <h3>Glass Effects</h3>
-                <p>Frosted glass morphism that adds depth and sophistication to every element.</p>
+                <h3>Liquid Glass</h3>
+                <p>Frosted glass effects so realistic, you'll try to wipe fingerprints off your screen.</p>
                 <div class="feature-glow"></div>
+                <div class="feature-border"></div>
             </div>
-            <div class="feature-card">
+            <div class="feature-card" data-tilt>
+                <div class="feature-card-bg"></div>
+                <div class="feature-number">04</div>
                 <div class="feature-icon">&#128640;</div>
-                <h3>Animations</h3>
-                <p>Silky smooth motion design that guides the eye and brings interfaces to life.</p>
+                <h3>Quantum Animations</h3>
+                <p>Motion design that exists in multiple states at once. Schrödinger's CSS.</p>
                 <div class="feature-glow"></div>
+                <div class="feature-border"></div>
             </div>
-            <div class="feature-card">
+            <div class="feature-card" data-tilt>
+                <div class="feature-card-bg"></div>
+                <div class="feature-number">05</div>
                 <div class="feature-icon">&#127769;</div>
-                <h3>Dark Mode</h3>
-                <p>A gorgeous dark palette that's easy on the eyes and stunning to behold.</p>
+                <h3>Cosmic Dark Mode</h3>
+                <p>So dark, it absorbs light from neighboring websites. Pure void energy.</p>
                 <div class="feature-glow"></div>
+                <div class="feature-border"></div>
             </div>
-            <div class="feature-card">
+            <div class="feature-card" data-tilt>
+                <div class="feature-card-bg"></div>
+                <div class="feature-number">06</div>
                 <div class="feature-icon">&#128142;</div>
-                <h3>Premium Feel</h3>
-                <p>Every interaction feels polished, premium, and absolutely delightful.</p>
+                <h3>Diamond Polish</h3>
+                <p>Every pixel hand-polished by digital artisans. We accept nothing less than perfection.</p>
                 <div class="feature-glow"></div>
+                <div class="feature-border"></div>
             </div>
         </div>
     </section>
@@ -131,29 +214,82 @@
     <!-- Showcase Section -->
     <section class="showcase" id="showcase">
         <div class="section-header">
+            <div class="section-eyebrow">&#128064; SHOWCASE</div>
             <h2 class="section-title">Feast Your <span class="gradient-text">Eyes</span></h2>
-            <p class="section-subtitle">Interactive elements that respond to your every move.</p>
+            <p class="section-subtitle">Interactive elements that make other websites jealous.</p>
         </div>
         <div class="showcase-grid">
-            <div class="showcase-item item-large">
+            <div class="showcase-item item-large" data-color="purple">
+                <div class="showcase-bg"></div>
                 <div class="showcase-content">
                     <div class="showcase-number">01</div>
-                    <h3>Immersive Experiences</h3>
-                    <p>Designs that pull you in and never let go.</p>
+                    <h3>Immersive Dimensions</h3>
+                    <p>Designs that warp reality and bend space-time.</p>
+                    <div class="showcase-arrow">&rarr;</div>
                 </div>
+                <div class="showcase-shimmer"></div>
             </div>
-            <div class="showcase-item">
+            <div class="showcase-item" data-color="cyan">
+                <div class="showcase-bg"></div>
                 <div class="showcase-content">
                     <div class="showcase-number">02</div>
-                    <h3>Bold Typography</h3>
-                    <p>Words that demand attention.</p>
+                    <h3>Neural Typography</h3>
+                    <p>Words that speak directly to your subconscious.</p>
+                    <div class="showcase-arrow">&rarr;</div>
                 </div>
+                <div class="showcase-shimmer"></div>
             </div>
-            <div class="showcase-item">
+            <div class="showcase-item" data-color="pink">
+                <div class="showcase-bg"></div>
                 <div class="showcase-content">
                     <div class="showcase-number">03</div>
-                    <h3>Fluid Motion</h3>
-                    <p>Everything flows like water.</p>
+                    <h3>Liquid Motion</h3>
+                    <p>Everything flows like mercury in zero gravity.</p>
+                    <div class="showcase-arrow">&rarr;</div>
+                </div>
+                <div class="showcase-shimmer"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials / Hype Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="section-header">
+            <div class="section-eyebrow">&#128293; THE HYPE</div>
+            <h2 class="section-title">What People <span class="gradient-text">Say</span></h2>
+        </div>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">&#11088;&#11088;&#11088;&#11088;&#11088;</div>
+                <p>"I showed this site to my designer friends and they all spontaneously combusted from jealousy."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">&#129333;</div>
+                    <div>
+                        <strong>Someone Cool</strong>
+                        <span>Chief Vibes Officer</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">&#11088;&#11088;&#11088;&#11088;&#11088;</div>
+                <p>"My GPU started crying tears of joy. The animations are THAT smooth."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">&#129504;</div>
+                    <div>
+                        <strong>Tech Enthusiast</strong>
+                        <span>Pixel Perfectionist</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">&#11088;&#11088;&#11088;&#11088;&#11088;</div>
+                <p>"I visited this site and my internet connection got a promotion. It's that prestigious."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">&#128526;</div>
+                    <div>
+                        <strong>Internet Explorer</strong>
+                        <span>Fancy Connoisseur</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -163,35 +299,48 @@
     <section class="stats">
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-number">99.9%</div>
+                <div class="stat-number" data-target="99.9">0</div>
+                <div class="stat-suffix">%</div>
                 <div class="stat-label">Fanciness Level</div>
+                <div class="stat-bar"><div class="stat-bar-fill" style="--fill: 99.9%"></div></div>
             </div>
             <div class="stat-item">
                 <div class="stat-number">&#8734;</div>
+                <div class="stat-suffix"></div>
                 <div class="stat-label">Style Points</div>
+                <div class="stat-bar"><div class="stat-bar-fill" style="--fill: 100%"></div></div>
             </div>
             <div class="stat-item">
-                <div class="stat-number">0</div>
+                <div class="stat-number" data-target="0">0</div>
+                <div class="stat-suffix"></div>
                 <div class="stat-label">Boring Pixels</div>
+                <div class="stat-bar"><div class="stat-bar-fill" style="--fill: 0%"></div></div>
             </div>
             <div class="stat-item">
-                <div class="stat-number">100%</div>
-                <div class="stat-label">Wow Factor</div>
+                <div class="stat-number" data-target="11">0</div>
+                <div class="stat-suffix">/10</div>
+                <div class="stat-label">Fancy Rating</div>
+                <div class="stat-bar"><div class="stat-bar-fill" style="--fill: 110%"></div></div>
             </div>
         </div>
     </section>
 
     <!-- CTA Section -->
     <section class="cta" id="contact">
+        <div class="cta-orb"></div>
         <div class="cta-content">
-            <h2>Ready to Get <span class="gradient-text">Super Fancy</span>?</h2>
-            <p>Join the revolution of beautiful web experiences.</p>
-            <a href="#" class="btn btn-primary btn-large">
-                <span>Let's Go</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
+            <h2>Ready to Ascend to <span class="gradient-text">Level 11</span>?</h2>
+            <p>Join the revolution. Leave boring behind. Embrace the fancy.</p>
+            <a href="#" class="btn btn-primary btn-large btn-glow">
+                <span class="btn-text">Transcend Now</span>
+                <span class="btn-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </span>
+                <span class="btn-shine"></span>
             </a>
+            <p class="cta-disclaimer">* Side effects may include: uncontrollable smiling, design inspiration overload, and an irresistible urge to redesign everything.</p>
         </div>
     </section>
 
@@ -202,12 +351,27 @@
                 <span class="logo-icon">&#10024;</span>
                 <span class="logo-text">SuperFancy</span>
             </div>
-            <p class="footer-tagline">Making the internet prettier, one pixel at a time.</p>
+            <p class="footer-tagline">Making the internet prettier, one pixel at a time. Since right now.</p>
             <div class="footer-links">
-                <a href="#">Twitter</a>
-                <a href="#">GitHub</a>
-                <a href="#">Dribbble</a>
-                <a href="#">Discord</a>
+                <a href="#" class="footer-link">
+                    <span>Twitter</span>
+                </a>
+                <a href="#" class="footer-link">
+                    <span>GitHub</span>
+                </a>
+                <a href="#" class="footer-link">
+                    <span>Dribbble</span>
+                </a>
+                <a href="#" class="footer-link">
+                    <span>Discord</span>
+                </a>
+            </div>
+            <div class="footer-fancy-meter">
+                <span>Fanciness:</span>
+                <div class="fancy-meter-bar">
+                    <div class="fancy-meter-fill"></div>
+                </div>
+                <span>MAX</span>
             </div>
             <p class="footer-copy">&copy; 2026 SuperFancy. All rights reserved. Stay fancy. &#10024;</p>
         </div>
