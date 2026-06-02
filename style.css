@@ -1349,3 +1349,289 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+
+
+/* ============================================
+   ELEMENT TOOLBAR
+   ============================================ */
+.element-toolbar {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(15, 15, 20, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    border-radius: 50px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), var(--glow-primary);
+}
+
+.toolbar-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.1rem;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 30px;
+    color: var(--text-secondary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toolbar-btn:hover {
+    background: rgba(139, 92, 246, 0.15);
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+}
+
+.toolbar-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.toolbar-btn-icon {
+    font-size: 1.1rem;
+}
+
+.toolbar-btn-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+}
+
+/* ============================================
+   PAGE ELEMENTS CONTAINER
+   ============================================ */
+.page-elements-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 500;
+}
+
+.page-elements-container .page-element {
+    pointer-events: auto;
+}
+
+/* ============================================
+   PAGE ELEMENT
+   ============================================ */
+.page-element {
+    position: absolute;
+    min-width: 80px;
+    min-height: 40px;
+    background: rgba(15, 15, 20, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: grab;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    user-select: none;
+}
+
+.page-element:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+}
+
+.page-element.dragging {
+    opacity: 0.85;
+    cursor: grabbing;
+    box-shadow: 0 15px 50px rgba(139, 92, 246, 0.3), var(--glow-primary);
+    border-color: var(--primary);
+    z-index: 10000;
+}
+
+/* Page Element Controls */
+.page-element-controls {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    display: flex;
+    gap: 0.3rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.page-element:hover .page-element-controls,
+.page-element:focus-within .page-element-controls {
+    opacity: 1;
+}
+
+.page-element-delete {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(244, 63, 94, 0.9);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.page-element-delete:hover {
+    background: rgba(244, 63, 94, 1);
+    transform: scale(1.15);
+    box-shadow: 0 2px 10px rgba(244, 63, 94, 0.5);
+}
+
+/* Page Element Content */
+.page-element-content {
+    min-height: 20px;
+}
+
+.page-element-content[contenteditable="true"] {
+    outline: none;
+    border: 1px dashed var(--primary-light);
+    border-radius: 4px;
+    padding: 0.25rem;
+    cursor: text;
+}
+
+/* Text element */
+.page-element[data-element-type="text"] {
+    min-width: 150px;
+    max-width: 400px;
+}
+
+.page-element[data-element-type="text"] .page-element-content {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+}
+
+/* Image element */
+.page-element[data-element-type="image"] {
+    min-width: 120px;
+    padding: 0.5rem;
+}
+
+.page-element[data-element-type="image"] img {
+    display: block;
+    max-width: 300px;
+    max-height: 250px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.page-element[data-element-type="image"] .image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed var(--border-glass);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* Image URL input */
+.page-element-url-input {
+    display: flex;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+}
+
+.page-element-url-input input {
+    flex: 1;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    outline: none;
+}
+
+.page-element-url-input input:focus {
+    border-color: var(--primary-light);
+}
+
+.page-element-url-input button {
+    padding: 0.4rem 0.7rem;
+    background: var(--primary);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.page-element-url-input button:hover {
+    background: var(--primary-light);
+}
+
+/* Separator element */
+.page-element[data-element-type="separator"] {
+    min-width: 200px;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    backdrop-filter: none;
+}
+
+.page-element[data-element-type="separator"]:hover {
+    box-shadow: none;
+}
+
+.page-element[data-element-type="separator"] hr {
+    border: none;
+    height: 2px;
+    background: var(--gradient-1);
+    background-size: 300% 300%;
+    animation: gradientShift 4s ease-in-out infinite;
+    border-radius: 1px;
+}
+
+/* ============================================
+   STORAGE WARNING BANNER
+   ============================================ */
+.storage-warning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    padding: 0.75rem 1.5rem;
+    background: rgba(251, 146, 60, 0.95);
+    color: #1a1a1a;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.storage-warning.visible {
+    transform: translateY(0);
+}

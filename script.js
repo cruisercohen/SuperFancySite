@@ -338,3 +338,543 @@ console.log('%c✨ SUPER FANCY SITE v11 ✨', 'font-size: 24px; color: #8b5cf6; 
 console.log('%c🎨 Fanciness Level: MAXIMUM', 'font-size: 14px; color: #06b6d4;');
 console.log('%c🚀 Performance Mode: LUDICROUS', 'font-size: 14px; color: #f472b6;');
 console.log('%c💎 Boring Pixels Found: 0', 'font-size: 14px; color: #34d399;');
+
+
+
+// ============================================
+// PAGE ELEMENT PERSISTENCE - Element_Store
+// ============================================
+
+const ElementStore = (() => {
+    const STORAGE_KEY = 'superfancy_page_elements';
+
+    /**
+     * Check if localStorage is accessible.
+     * @returns {boolean}
+     */
+    function isAvailable() {
+        try {
+            const testKey = '__storage_test__';
+            localStorage.setItem(testKey, '1');
+            localStorage.removeItem(testKey);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
+     * Validate a single Element_Descriptor against the expected schema.
+     * @param {*} descriptor - The object to validate
+     * @returns {boolean}
+     */
+    function isValidDescriptor(descriptor) {
+        if (!descriptor || typeof descriptor !== 'object') return false;
+        if (typeof descriptor.id !== 'string' || descriptor.id.length === 0) return false;
+        if (!['text', 'image', 'separator'].includes(descriptor.type)) return false;
+        if (typeof descriptor.content !== 'string') return false;
+        if (!descriptor.position || typeof descriptor.position !== 'object') return false;
+        if (typeof descriptor.position.x !== 'number' || typeof descriptor.position.y !== 'number') return false;
+        if (!descriptor.style || typeof descriptor.style !== 'object') return false;
+        if (typeof descriptor.createdAt !== 'string' || !isValidISO8601(descriptor.createdAt)) return false;
+        if (typeof descriptor.updatedAt !== 'string' || !isValidISO8601(descriptor.updatedAt)) return false;
+        return true;
+    }
+
+    /**
+     * Check if a string is a valid ISO 8601 date string.
+     * @param {string} str
+     * @returns {boolean}
+     */
+    function isValidISO8601(str) {
+        const date = new Date(str);
+        return !isNaN(date.getTime());
+    }
+
+    /**
+     * Serialize and save descriptors to localStorage.
+     * @param {Array} descriptors - Array of Element_Descriptors
+     * @returns {boolean} - true if save succeeded, false otherwise
+     */
+    function save(descriptors) {
+        if (!isAvailable()) return false;
+        try {
+            const json = JSON.stringify(descriptors);
+            localStorage.setItem(STORAGE_KEY, json);
+            return true;
+        } catch (e) {
+            console.warn('[ElementStore] Save failed:', e.message);
+            return false;
+        }
+    }
+
+    /**
+     * Read, parse, and validate stored descriptors from localStorage.
+     * @returns {Array} - Array of valid Element_Descriptors (empty array on failure)
+     */
+    function load() {
+        if (!isAvailable()) return [];
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return [];
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) {
+                console.warn('[ElementStore] Stored data is not an array. Discarding.');
+                return [];
+            }
+            const valid = [];
+            for (const descriptor of parsed) {
+                if (isValidDescriptor(descriptor)) {
+                    valid.push(descriptor);
+                } else {
+                    console.warn('[ElementStore] Skipping invalid descriptor:', descriptor);
+                }
+            }
+            return valid;
+        } catch (e) {
+            console.warn('[ElementStore] Failed to parse stored data:', e.message);
+            return [];
+        }
+    }
+
+    /**
+     * Remove all stored element data from localStorage.
+     */
+    function clear() {
+        if (!isAvailable()) return;
+        try {
+            localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {
+            console.warn('[ElementStore] Clear failed:', e.message);
+        }
+    }
+
+    return {
+        isAvailable,
+        save,
+        load,
+        clear,
+        isValidDescriptor,
+        STORAGE_KEY
+    };
+})();
+
+
+
+// ============================================
+// PAGE ELEMENT PERSISTENCE - Element_Manager
+// ============================================
+
+const ElementManager = (() => {
+    let descriptors = [];
+    let container = null;
+
+    /**
+     * Generate a unique ID.
+     * Uses crypto.randomUUID() with fallback.
+     * @returns {string}
+     */
+    function generateId() {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return crypto.randomUUID();
+        }
+        // Fallback for older browsers
+        return Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    /**
+     * Initialize the Element_Manager.
+     * Loads descriptors from store and restores elements.
+     */
+    function init() {
+        container = document.getElementById('pageElementsContainer');
+        if (!container) return;
+
+        if (!ElementStore.isAvailable()) {
+            showStorageWarning('Local storage is unavailable. Your customizations will not be saved.');
+            return;
+        }
+
+        descriptors = ElementStore.load();
+        restoreElements(descriptors);
+    }
+
+    /**
+     * Create a new element of the given type.
+     * @param {string} type - 'text', 'image', or 'separator'
+     * @returns {object} - The created Element_Descriptor
+     */
+    function createElement(type) {
+        const now = new Date().toISOString();
+        const descriptor = {
+            id: generateId(),
+            type: type,
+            content: type === 'text' ? 'Double-click to edit' : '',
+            position: {
+                x: Math.min(200 + Math.random() * 200, window.innerWidth - 250),
+                y: Math.min(200 + Math.random() * 200, window.innerHeight - 200)
+            },
+            style: { width: null, height: null },
+            createdAt: now,
+            updatedAt: now
+        };
+
+        descriptors.push(descriptor);
+        const saved = ElementStore.save(descriptors);
+        if (!saved && ElementStore.isAvailable()) {
+            showStorageWarning('Changes cannot be saved — storage is full.');
+        }
+        renderElement(descriptor);
+        return descriptor;
+    }
+
+    /**
+     * Update an element descriptor by ID.
+     * @param {string} id - Element ID
+     * @param {object} changes - Partial descriptor changes
+     */
+    function updateElement(id, changes) {
+        const index = descriptors.findIndex(d => d.id === id);
+        if (index === -1) return;
+
+        Object.assign(descriptors[index], changes);
+        descriptors[index].updatedAt = new Date().toISOString();
+        const saved = ElementStore.save(descriptors);
+        if (!saved && ElementStore.isAvailable()) {
+            showStorageWarning('Changes cannot be saved — storage is full.');
+        }
+    }
+
+    /**
+     * Delete an element by ID.
+     * @param {string} id - Element ID
+     */
+    function deleteElement(id) {
+        descriptors = descriptors.filter(d => d.id !== id);
+        ElementStore.save(descriptors);
+    }
+
+    /**
+     * Get all current descriptors.
+     * @returns {Array}
+     */
+    function getAllDescriptors() {
+        return descriptors;
+    }
+
+    /**
+     * Restore elements from descriptor array to DOM.
+     * @param {Array} descs - Array of Element_Descriptors
+     */
+    function restoreElements(descs) {
+        if (!container) return;
+        descs.forEach(descriptor => renderElement(descriptor));
+    }
+
+    /**
+     * Render a single element to the DOM.
+     * @param {object} descriptor - Element_Descriptor
+     */
+    function renderElement(descriptor) {
+        if (!container) return;
+
+        const el = document.createElement('div');
+        el.className = 'page-element';
+        el.dataset.elementId = descriptor.id;
+        el.dataset.elementType = descriptor.type;
+        el.style.left = descriptor.position.x + 'px';
+        el.style.top = descriptor.position.y + 'px';
+
+        // Controls (delete button)
+        const controls = document.createElement('div');
+        controls.className = 'page-element-controls';
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'page-element-delete';
+        deleteBtn.setAttribute('aria-label', 'Delete element');
+        deleteBtn.textContent = '\u00D7';
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteElement(descriptor.id);
+            el.remove();
+        });
+        controls.appendChild(deleteBtn);
+        el.appendChild(controls);
+
+        // Content area
+        const content = document.createElement('div');
+        content.className = 'page-element-content';
+
+        switch (descriptor.type) {
+            case 'text':
+                content.textContent = descriptor.content || 'Double-click to edit';
+                // Double-click to edit
+                el.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    activateTextEdit(el, content, descriptor.id);
+                });
+                break;
+
+            case 'image':
+                if (descriptor.content) {
+                    const img = document.createElement('img');
+                    img.src = descriptor.content;
+                    img.alt = 'User image';
+                    img.addEventListener('error', () => {
+                        img.style.display = 'none';
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'image-placeholder';
+                        placeholder.textContent = 'Image not found';
+                        content.appendChild(placeholder);
+                    });
+                    content.appendChild(img);
+                } else {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'image-placeholder';
+                    placeholder.textContent = 'Double-click to set image URL';
+                    content.appendChild(placeholder);
+                }
+                // Double-click to edit URL
+                el.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    activateImageEdit(el, content, descriptor.id);
+                });
+                break;
+
+            case 'separator':
+                const hr = document.createElement('hr');
+                content.appendChild(hr);
+                break;
+        }
+
+        el.appendChild(content);
+
+        // Drag-and-drop via pointer events
+        setupDrag(el, descriptor.id);
+
+        container.appendChild(el);
+    }
+
+    /**
+     * Activate inline text editing.
+     */
+    function activateTextEdit(el, contentDiv, id) {
+        if (contentDiv.getAttribute('contenteditable') === 'true') return;
+
+        contentDiv.setAttribute('contenteditable', 'true');
+        contentDiv.focus();
+        el.style.cursor = 'text';
+
+        // Select all text
+        const range = document.createRange();
+        range.selectNodeContents(contentDiv);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        function finishEdit() {
+            contentDiv.setAttribute('contenteditable', 'false');
+            el.style.cursor = 'grab';
+            const newContent = contentDiv.textContent.trim() || 'Double-click to edit';
+            contentDiv.textContent = newContent;
+            updateElement(id, { content: newContent });
+            contentDiv.removeEventListener('blur', finishEdit);
+            contentDiv.removeEventListener('keydown', handleKey);
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                contentDiv.blur();
+            }
+        }
+
+        contentDiv.addEventListener('blur', finishEdit);
+        contentDiv.addEventListener('keydown', handleKey);
+    }
+
+    /**
+     * Activate image URL editing.
+     */
+    function activateImageEdit(el, contentDiv, id) {
+        // Don't open another input if one already exists
+        if (el.querySelector('.page-element-url-input')) return;
+
+        const inputContainer = document.createElement('div');
+        inputContainer.className = 'page-element-url-input';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Enter image URL...';
+        const currentDescriptor = descriptors.find(d => d.id === id);
+        if (currentDescriptor && currentDescriptor.content) {
+            input.value = currentDescriptor.content;
+        }
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.textContent = 'Set';
+
+        function applyUrl() {
+            const url = input.value.trim();
+            if (url) {
+                updateElement(id, { content: url });
+                // Re-render content
+                contentDiv.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'User image';
+                img.addEventListener('error', () => {
+                    img.style.display = 'none';
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'image-placeholder';
+                    placeholder.textContent = 'Image not found';
+                    contentDiv.appendChild(placeholder);
+                });
+                contentDiv.appendChild(img);
+            }
+            inputContainer.remove();
+        }
+
+        confirmBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            applyUrl();
+        });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyUrl();
+            }
+        });
+
+        inputContainer.appendChild(input);
+        inputContainer.appendChild(confirmBtn);
+        el.appendChild(inputContainer);
+        input.focus();
+    }
+
+    /**
+     * Setup drag-and-drop via pointer events.
+     */
+    function setupDrag(el, id) {
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        el.addEventListener('pointerdown', (e) => {
+            // Don't drag if interacting with controls, editing, or input
+            if (e.target.closest('.page-element-delete') ||
+                e.target.closest('.page-element-url-input') ||
+                e.target.getAttribute('contenteditable') === 'true') {
+                return;
+            }
+
+            isDragging = true;
+            offsetX = e.clientX - el.offsetLeft;
+            offsetY = e.clientY - el.offsetTop;
+            el.classList.add('dragging');
+            el.setPointerCapture(e.pointerId);
+            e.preventDefault();
+        });
+
+        el.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+
+            let newX = e.clientX - offsetX;
+            let newY = e.clientY - offsetY;
+
+            // Clamp to viewport boundaries
+            newX = Math.max(0, Math.min(newX, window.innerWidth - el.offsetWidth));
+            newY = Math.max(0, Math.min(newY, window.innerHeight - el.offsetHeight));
+
+            el.style.left = newX + 'px';
+            el.style.top = newY + 'px';
+        });
+
+        el.addEventListener('pointerup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            el.classList.remove('dragging');
+            el.releasePointerCapture(e.pointerId);
+
+            const newX = parseInt(el.style.left, 10);
+            const newY = parseInt(el.style.top, 10);
+            updateElement(id, { position: { x: newX, y: newY } });
+        });
+    }
+
+    /**
+     * Show storage warning banner.
+     * @param {string} message
+     */
+    function showStorageWarning(message) {
+        let banner = document.querySelector('.storage-warning');
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.className = 'storage-warning';
+            document.body.prepend(banner);
+        }
+        banner.textContent = message;
+        requestAnimationFrame(() => banner.classList.add('visible'));
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            banner.classList.remove('visible');
+        }, 5000);
+    }
+
+    return {
+        init,
+        createElement,
+        updateElement,
+        deleteElement,
+        getAllDescriptors,
+        restoreElements,
+        generateId
+    };
+})();
+
+// ============================================
+// PAGE ELEMENT PERSISTENCE - Element_Toolbar
+// ============================================
+
+const ElementToolbar = (() => {
+    /**
+     * Initialize toolbar with click handlers.
+     * @param {string} containerSelector - CSS selector for toolbar container
+     */
+    function init(containerSelector) {
+        const toolbar = document.querySelector(containerSelector || '#elementToolbar');
+        if (!toolbar) return;
+
+        const buttons = toolbar.querySelectorAll('.toolbar-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.dataset.elementType;
+                if (type) {
+                    ElementManager.createElement(type);
+                }
+            });
+        });
+    }
+
+    /**
+     * Get available element types.
+     * @returns {string[]}
+     */
+    function getAvailableTypes() {
+        return ['text', 'image', 'separator'];
+    }
+
+    return {
+        init,
+        getAvailableTypes
+    };
+})();
+
+// ============================================
+// PAGE ELEMENT PERSISTENCE - Page Load Init
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    ElementToolbar.init('#elementToolbar');
+    ElementManager.init();
+});
