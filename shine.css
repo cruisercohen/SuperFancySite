@@ -1,0 +1,255 @@
+/* ============================================
+   SUPER FANCY SITE - EXTRA SHINE LAYER ✨
+   Additive effects layered on top of style.css.
+   Everything here only ADDS sparkle — nothing
+   overrides the existing look.
+   ============================================ */
+
+:root {
+    --shine-white: rgba(255, 255, 255, 0.85);
+    --shine-gold: #ffe89e;
+    --shine-holo: linear-gradient(
+        115deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.35) 45%,
+        rgba(167, 139, 250, 0.5) 50%,
+        rgba(34, 211, 238, 0.4) 55%,
+        transparent 80%
+    );
+}
+
+/* ============================================
+   GLOBAL SPARKLE FIELD
+   A drifting layer of twinkling dots behind everything.
+   ============================================ */
+.shine-field {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.shine-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--shine-white);
+    border-radius: 50%;
+    box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    animation: twinkle var(--tw-dur, 4s) ease-in-out infinite;
+    animation-delay: var(--tw-delay, 0s);
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.4); }
+    50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ============================================
+   HOLOGRAPHIC SHEEN SWEEP
+   A diagonal light sweep that periodically crosses
+   cards for that "premium foil card" glint.
+   ============================================ */
+.feature-card::before,
+.showcase-item::before,
+.testimonial-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--shine-holo);
+    background-size: 250% 250%;
+    background-position: 150% 150%;
+    mix-blend-mode: screen;
+    opacity: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 3;
+    transition: opacity 0.4s ease;
+}
+
+.feature-card:hover::before,
+.showcase-item:hover::before,
+.testimonial-card:hover::after {
+    opacity: 0.9;
+    animation: holoSweep 1.1s ease-out;
+}
+
+@keyframes holoSweep {
+    from { background-position: 150% 150%; }
+    to { background-position: -50% -50%; }
+}
+
+/* ============================================
+   GLOWING TITLE TEXT
+   Give gradient headings a soft radiant halo that
+   gently breathes.
+   ============================================ */
+.hero-title .gradient-text,
+.section-title .gradient-text,
+.showcase-number,
+.stat-number {
+    filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.45))
+            drop-shadow(0 0 24px rgba(34, 211, 238, 0.25));
+    animation: textGlowPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes textGlowPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(167, 139, 250, 0.35))
+                drop-shadow(0 0 20px rgba(34, 211, 238, 0.2));
+    }
+    50% {
+        filter: drop-shadow(0 0 18px rgba(167, 139, 250, 0.65))
+                drop-shadow(0 0 36px rgba(34, 211, 238, 0.4));
+    }
+}
+
+/* ============================================
+   SHIMMERING BORDERS
+   A conic-gradient "rotating light" ring around cards.
+   ============================================ */
+.feature-card,
+.testimonial-card,
+.showcase-item {
+    position: relative;
+}
+
+.feature-card > .shine-ring,
+.testimonial-card > .shine-ring,
+.showcase-item > .shine-ring {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+        from var(--ring-angle, 0deg),
+        transparent 0deg,
+        rgba(255, 255, 255, 0.9) 30deg,
+        var(--primary-light) 60deg,
+        transparent 120deg,
+        transparent 360deg
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.feature-card:hover > .shine-ring,
+.testimonial-card:hover > .shine-ring,
+.showcase-item:hover > .shine-ring {
+    opacity: 1;
+    animation: ringSpin 3s linear infinite;
+}
+
+@property --ring-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes ringSpin {
+    from { --ring-angle: 0deg; }
+    to { --ring-angle: 360deg; }
+}
+
+/* ============================================
+   BUTTON EXTRA GLEAM
+   A permanent slow specular streak on primary buttons.
+   ============================================ */
+.btn-primary {
+    position: relative;
+}
+
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 40%;
+    height: 200%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.55),
+        transparent
+    );
+    transform: rotate(20deg);
+    animation: btnGleam 4.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes btnGleam {
+    0% { left: -60%; }
+    60%, 100% { left: 160%; }
+}
+
+/* ============================================
+   LOGO SHINE
+   Make the sparkle logo icon actually sparkle harder.
+   ============================================ */
+.logo-icon {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+}
+
+/* ============================================
+   CLICK SPARKLE BURST (spawned from shine.js)
+   ============================================ */
+.click-sparkle {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, var(--primary-light) 60%, transparent 70%);
+    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    animation: sparkleBurst 0.7s ease-out forwards;
+}
+
+@keyframes sparkleBurst {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform:
+            translate(
+                calc(-50% + var(--dx, 0px)),
+                calc(-50% + var(--dy, 0px))
+            )
+            scale(0.2);
+    }
+}
+
+/* ============================================
+   REDUCED MOTION RESPECT
+   Keep the shine tasteful for folks who prefer calm.
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    .shine-star,
+    .btn-primary::after,
+    .hero-title .gradient-text,
+    .section-title .gradient-text,
+    .showcase-number,
+    .stat-number {
+        animation: none !important;
+    }
+    .feature-card:hover::before,
+    .showcase-item:hover::before,
+    .testimonial-card:hover::after,
+    .feature-card:hover > .shine-ring,
+    .testimonial-card:hover > .shine-ring,
+    .showcase-item:hover > .shine-ring {
+        animation: none !important;
+    }
+}
